@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Image {
+  id                 String   @id @default(cuid())
+  size               Int
+  filename           String
+  s3Name             String
+  type              String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  Gallery            Gallery? @relation(fields: [galleryId], references: [id])
+  galleryId          String?
+  galleryIndexNumber Int
+}
+
+model Artist {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  bio       String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  galleries Gallery[]
+}
+
+model Gallery {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  images      Image[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      Artist   @relation(fields: [authorId], references: [id])
+  authorId    String
+  tags        String[]
+}

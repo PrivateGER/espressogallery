@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu, MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger
+} from "@/components/ui/menubar";
+import Link from "next/link";
+import {Toaster} from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,7 +38,39 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Menubar>
+          <MenubarMenu>
+            <MenubarTrigger>Gallery</MenubarTrigger>
+            <MenubarContent>
+              <Link href={"/gallery/create"}>
+                <MenubarItem>
+                  New
+                </MenubarItem>
+              </Link>
+              <MenubarSeparator />
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger>Artists</MenubarTrigger>
+            <MenubarContent>
+              <Link href={"/artist/create"}>
+                <MenubarItem>
+                  New
+                </MenubarItem>
+              </Link>
+              <Link href={"/artist/list"}>
+                <MenubarItem>
+                  List
+                </MenubarItem>
+              </Link>
+              <MenubarSeparator />
+            </MenubarContent>
+          </MenubarMenu>
+        </Menubar>
+        <div className={"p-4"}>
+          {children}
+        </div>
+        <Toaster />
       </body>
     </html>
   );
