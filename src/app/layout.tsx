@@ -44,10 +44,15 @@ export default function RootLayout({
             <MenubarContent>
               <Link href={"/gallery/create"}>
                 <MenubarItem>
-                  New
+                  New...
                 </MenubarItem>
               </Link>
               <MenubarSeparator />
+              <Link href={"/gallery/list"}>
+                  <MenubarItem>
+                  List
+                  </MenubarItem>
+              </Link>
             </MenubarContent>
           </MenubarMenu>
           <MenubarMenu>
@@ -55,15 +60,15 @@ export default function RootLayout({
             <MenubarContent>
               <Link href={"/artist/create"}>
                 <MenubarItem>
-                  New
+                  New...
                 </MenubarItem>
               </Link>
+              <MenubarSeparator />
               <Link href={"/artist/list"}>
                 <MenubarItem>
                   List
                 </MenubarItem>
               </Link>
-              <MenubarSeparator />
             </MenubarContent>
           </MenubarMenu>
         </Menubar>

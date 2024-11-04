@@ -14,12 +14,14 @@ import {startS3Upload} from "@/lib/s3";
 import type { Artist } from "@prisma/client";
 import {router} from "next/client";
 import {Progress} from "@/components/ui/progress";
+import {useRouter} from "next/navigation";
 
 export default function CreateGalleryPage() {
     const [files, setFiles] = useState<File[]>([]);
     const { toast } = useToast();
     const cachedObjectURLs = new Map<string, string>();
     const [artistList, setArtistList] = useState([]);
+    const router = useRouter();
 
     const galleryName = useRef<HTMLInputElement>(null);
     const galleryDescription = useRef<HTMLTextAreaElement>(null);
@@ -52,6 +54,7 @@ export default function CreateGalleryPage() {
         return (bytes / 1024 / 1024).toFixed(2);
     }
 
+    // @ts-ignore
     const DraggableFile = memo(({ file, index }) => (
         <Draggable key={index} draggableId={file.name} index={index}>
             {(provided, snapshot) => (
@@ -61,9 +64,11 @@ export default function CreateGalleryPage() {
                     {...provided.dragHandleProps}
                     className="relative w-full h-24 border-2 border-black rounded"
                 >
-                    {file.type.startsWith('image') ?
-                        <img src={getObjectURL(file)} alt={file.name} className="max-w-1/3 h-full aspect-auto" /> :
-                        <video src={getObjectURL(file)} playsInline className="pointer-events-none max-w-1/3 h-full aspect-auto" />}
+                    { !isUploading ? file.type.startsWith('image') ?
+                                <img src={getObjectURL(file)} alt={file.name} className="max-w-1/3 h-full aspect-auto" /> :
+                                <video src={getObjectURL(file)} playsInline className="pointer-events-none max-w-1/3 h-full aspect-auto" /> : null
+                    }
+
                     <div className="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white p-1 overflow-ellipsis max-w-full"> {file.name} </div>
                     <div className="absolute top-0 right-0 bg-black bg-opacity-50 text-white p-1">Index {index} - {bytesToMB(file.size)} MB </div>
                 </div>
@@ -210,6 +215,8 @@ export default function CreateGalleryPage() {
         });
     }, []);
 
+    // @ts-ignore
+    // @ts-ignore
     return (
         <div className="flex justify-center">
             <Card className="w-3/4 content-center">
@@ -266,6 +273,7 @@ export default function CreateGalleryPage() {
                                 {(provided) => (
                                     <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-col gap-4">
                                         {files.map((file, index) => (
+                                            // @ts-ignore
                                             <DraggableFile key={file.name} file={file} index={index} />
                                         ))}
                                         {provided.placeholder}
@@ -276,7 +284,7 @@ export default function CreateGalleryPage() {
 
                         {
                             (isUploading) ?
-                                <Progress className={"mt-4 "} value={progressState.uploaded / progressState.total} /> : null
+                                <Progress className={"mt-4 "} value={(progressState.uploaded / progressState.total) * 100} max={100} /> : null
                         }
 
                         <div className="flex items-center justify-between mt-4">

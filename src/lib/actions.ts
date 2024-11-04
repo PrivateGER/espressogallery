@@ -1,13 +1,12 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import {redirect} from "next/navigation";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
+export const getS3BaseUrl = async () => {
+    return process.env.S3_BASE_URL;
+}
 
 export const createArtist = async (name: string, description: string) => {
-
     if (!name) {
         throw new Error("Name is required");
     }
@@ -29,7 +28,6 @@ export const createArtist = async (name: string, description: string) => {
 }
 
 export const artistNameExists = async (name: string) => {
-
     const artist = await prisma.artist.findUnique({
         where: {
             name
@@ -47,6 +45,9 @@ export const getArtist = async (id: string) => {
     return prisma.artist.findUnique({
         where: {
             id
+        },
+        include: {
+            galleries: true
         }
     });
 }
@@ -89,8 +90,38 @@ export const createGallery = async (name: string, description: string, artistId:
         }
     });
 
-
-
     return gallery;
 }
 
+export const getGalleries = async () => {
+    return prisma.gallery.findMany();
+}
+
+export const getGalleriesWithImages = async () => {
+    return prisma.gallery.findMany({
+        include: {
+            images: {
+                orderBy: {
+                    galleryIndexNumber: "asc"
+                }
+            }
+        }
+    });
+}
+
+export const getGallery = async (id: string) => {
+    return prisma.gallery.findUnique({
+        where: {
+            id
+        },
+        include: {
+            images: {
+                orderBy: {
+                    galleryIndexNumber: "asc"
+                }
+            },
+            author: true
+        }
+    });
+
+}
